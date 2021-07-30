@@ -40,13 +40,42 @@ resource "aws_instance" "redmine" {
   )
 }
 
-resource "aws_eip" "redmine" {
-  vpc = true
+# resource "aws_eip" "redmine" {
+#   vpc = true
 
-  instance                  = aws_instance.redmine.id
-  associate_with_private_ip = "${local.vpc_cidr_network}.1.10"
-  depends_on                = [aws_internet_gateway.main]
+#   instance                  = aws_instance.redmine.id
+#   associate_with_private_ip = "${local.vpc_cidr_network}.1.10"
+#   depends_on                = [aws_internet_gateway.main]
+# }
+
+resource "aws_instance" "redmine-2" {
+  ami                  = data.aws_ami.amazon_linux.id
+  instance_type        = "t2.micro"
+  user_data            = file("./ec2-instance/user-data.sh")
+  iam_instance_profile = aws_iam_instance_profile.redmine.name
+  key_name             = "grw-easy-infra"
+  subnet_id            = aws_subnet.dummy.id
+  private_ip           = "${local.vpc_cidr_network}.2.10"
+
+  vpc_security_group_ids = [
+    aws_security_group.redmine.id
+  ]
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.prefix}-server"
+    },
+  )
 }
+
+# resource "aws_eip" "redmine-2" {
+#   vpc = true
+
+#   instance                  = aws_instance.redmine-2.id
+#   associate_with_private_ip = "${local.vpc_cidr_network}.2.10"
+#   depends_on                = [aws_internet_gateway.main]
+# }
 
 resource "aws_security_group" "redmine" {
   description = "Control server inbound and outbound access"

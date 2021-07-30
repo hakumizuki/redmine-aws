@@ -7,3 +7,8 @@ variable "prefix" {
 variable "project" {
   default = "redmine-aws"
 }
+
+variable "dns_zone_name" {
+  description = "Domain name"
+  default     = "youthpod.org"
+}
