@@ -2,4 +2,4 @@
 .terraform.lock.hcl
 sample.tfvars
 terraform.tfvars
-user-data.sh
+infra/ec2-instance/user-data.sh
