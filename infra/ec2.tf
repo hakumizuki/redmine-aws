@@ -25,7 +25,7 @@ resource "aws_instance" "redmine" {
   user_data            = file("./ec2-instance/user-data.sh")
   iam_instance_profile = aws_iam_instance_profile.redmine.name
   key_name             = "grw-easy-infra"
-  subnet_id            = aws_subnet.public.id
+  subnet_id            = aws_subnet.public_a.id
   private_ip           = "${local.vpc_cidr_network}.1.10"
 
   vpc_security_group_ids = [
@@ -54,7 +54,7 @@ resource "aws_instance" "redmine-2" {
   user_data            = file("./ec2-instance/user-data.sh")
   iam_instance_profile = aws_iam_instance_profile.redmine.name
   key_name             = "grw-easy-infra"
-  subnet_id            = aws_subnet.dummy.id
+  subnet_id            = aws_subnet.public_c.id
   private_ip           = "${local.vpc_cidr_network}.2.10"
 
   vpc_security_group_ids = [
@@ -107,6 +107,13 @@ resource "aws_security_group" "redmine" {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol    = "tcp"
+    from_port   = 5432
+    to_port     = 5432
     cidr_blocks = ["0.0.0.0/0"]
   }
 

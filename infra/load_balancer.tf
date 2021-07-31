@@ -2,8 +2,8 @@ resource "aws_lb" "app" {
   name               = "${local.prefix}-main"
   load_balancer_type = "application"
   subnets = [
-    aws_subnet.public.id,
-    aws_subnet.dummy.id,
+    aws_subnet.public_a.id,
+    aws_subnet.public_c.id,
   ]
 
   security_groups = [aws_security_group.lb.id]
