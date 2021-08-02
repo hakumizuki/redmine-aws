@@ -2,15 +2,14 @@ data "aws_ami" "amazon_linux" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-2.0.*-x86_64-gp2"]
+    values = ["bitnami-redmine-4.2.2-0-linux-debian-10-x86_64-hvm-ebs-nami"]
   }
-  owners = ["amazon"]
+  owners = ["979382823631"]
 }
 
 resource "aws_iam_role" "redmine" {
   name               = "${local.prefix}-server"
   assume_role_policy = file("./ec2-instance/instance-profile-policy.json")
-
   tags = local.common_tags
 }
 
@@ -22,7 +21,6 @@ resource "aws_iam_instance_profile" "redmine" {
 resource "aws_instance" "redmine" {
   ami                  = data.aws_ami.amazon_linux.id
   instance_type        = "t2.micro"
-  user_data            = file("./ec2-instance/user-data.sh")
   iam_instance_profile = aws_iam_instance_profile.redmine.name
   key_name             = "grw-easy-infra"
   subnet_id            = aws_subnet.public_a.id
@@ -40,18 +38,9 @@ resource "aws_instance" "redmine" {
   )
 }
 
-# resource "aws_eip" "redmine" {
-#   vpc = true
-
-#   instance                  = aws_instance.redmine.id
-#   associate_with_private_ip = "${local.vpc_cidr_network}.1.10"
-#   depends_on                = [aws_internet_gateway.main]
-# }
-
 resource "aws_instance" "redmine-2" {
   ami                  = data.aws_ami.amazon_linux.id
   instance_type        = "t2.micro"
-  user_data            = file("./ec2-instance/user-data.sh")
   iam_instance_profile = aws_iam_instance_profile.redmine.name
   key_name             = "grw-easy-infra"
   subnet_id            = aws_subnet.public_c.id
@@ -68,14 +57,6 @@ resource "aws_instance" "redmine-2" {
     },
   )
 }
-
-# resource "aws_eip" "redmine-2" {
-#   vpc = true
-
-#   instance                  = aws_instance.redmine-2.id
-#   associate_with_private_ip = "${local.vpc_cidr_network}.2.10"
-#   depends_on                = [aws_internet_gateway.main]
-# }
 
 resource "aws_security_group" "redmine" {
   description = "Control server inbound and outbound access"
